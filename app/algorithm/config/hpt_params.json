@@ -1,0 +1,28 @@
+[
+  {
+    "name": "metric",
+    "short_desc": "Metric to use for distance computation. Any metric from scikit-learn or scipy.spatial.distance can be used.",
+    "default": "minkowski",
+    "type": "categorical",
+    "categorical_vals": ["minkowski", "l1", "cosine", "sqeuclidean"],
+    "run_HPO": false
+  },
+  {
+    "name": "cluster_method",
+    "short_desc": "The extraction method used to extract clusters using the calculated reachability and ordering. Possible values are 'xi' and 'dbscan'",
+    "default": "xi",
+    "type": "categorical",
+    "categorical_vals": ["xi", "dbscan"],
+    "run_HPO": true
+  },
+  {
+    "name": "min_cluster_size",
+    "short_desc": "Minimum number of samples in an OPTICS cluster, expressed as a fraction of the number of samples (rounded to be at least 2).",
+    "default": 0.1,
+    "range_low": 0.05,
+    "type": "real",
+    "range_high": 0.4,
+    "search_type": "uniform",
+    "run_HPO": true
+  }
+]

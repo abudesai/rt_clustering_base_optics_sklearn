@@ -1,0 +1,16 @@
+{
+  "pp_params": {
+    "pp_step_names": {
+      "COLUMN_SELECTOR": "column_selector",
+      "FLOAT_TYPE_CASTER": "float_type_caster",
+      "STANDARD_SCALER": "standard_scaler",
+      "X_SPLITTER": "x_selector"
+    }
+  },
+  "data_schema_keys": {
+    "attributes": "attributes",
+    "id_field": "idField",
+    "attr_type": "attributeType",
+    "attr_name": "attributeName"
+  }
+}
