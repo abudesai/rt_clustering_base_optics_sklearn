@@ -1,4 +1,4 @@
-OPTICS Model build in Sklearn for Clustering - Base problem category as per Ready Tensor specifications.
+OPTICS Model built in Sklearn for Clustering - Base problem category as per Ready Tensor specifications.
 
 - OPTICS
 - clustering
