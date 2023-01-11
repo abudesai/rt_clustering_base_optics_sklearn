@@ -12,7 +12,6 @@ from sklearn.manifold import TSNE
 sys.path.insert(0, './../app')
 import algorithm.utils as utils
 import algorithm.model_trainer as model_trainer
-import algorithm.model_tuner as model_tuner
 import algorithm.preprocessing.pipeline as pipeline
 import algorithm.model.clustering as clustering
 
@@ -90,20 +89,8 @@ def copy_example_files(dataset_name):
     # data schema
     shutil.copyfile(f"{local_datapath}/{dataset_name}/{dataset_name}_schema.json", os.path.join(data_schema_path, f"{dataset_name}_schema.json"))
     # data
-    shutil.copyfile(f"{local_datapath}/{dataset_name}/{dataset_name}_test.csv", os.path.join(data_path, f"{dataset_name}_test.csv"))
-    # hyperparameters
-    shutil.copyfile("./examples/hyperparameters.json", os.path.join(hyper_param_path, "hyperparameters.json"))
-
-
-
-def run_HPT(num_hpt_trials): 
-    # Read data
-    train_data = utils.get_data(data_path)    
-    # read data config
-    data_schema = utils.get_data_schema(data_schema_path)  
-    # run hyper-parameter tuning. This saves results in each trial, so nothing is returned
-    model_tuner.tune_hyperparameters(train_data, data_schema, num_hpt_trials, hyper_param_path, hpt_results_path)
-
+    shutil.copyfile(f"{local_datapath}/{dataset_name}/{dataset_name}.csv", os.path.join(data_path, f"{dataset_name}_test.csv"))
+   
 
 def train_and_predict():
     # Read hyperparameters
@@ -146,7 +133,6 @@ def score(test_data, predictions, data_schema):
     test_data_with_pred_clusters = test_data.merge(predictions, on=id_field)    
     # standardize the data before doing internal validation    
     scaled_test_data = standardize_data(test_data_with_pred_clusters[X_cols], data_schema)
-        
     # internal validation metrics
     n_clusters = len(set(test_data_with_pred_clusters[prediction_col]))
     if n_clusters == 1: 
@@ -206,7 +192,7 @@ def save_scoring_outputs(results, dataset_name, run_hpt = False, chart_data=None
         axs[1].scatter(X[:, 0], X[:, 1], alpha=0.3, c=y_hat)
         axs[1].set_title('predicted clusters')
         file_path_and_name = get_file_path_and_name(dataset_name, run_hpt, file_type="scatter")
-        plt.suptitle(f"clusters on tsne-reduced data for {dataset_name} dataset with {run_hpt=}")
+        plt.suptitle(f"{model_name} clusters for {dataset_name} dataset with {run_hpt=}")
         plt.savefig(file_path_and_name)
         plt.clf()
 
@@ -262,8 +248,7 @@ def run_train_and_test(dataset_name, run_hpt=False, num_hpt_trials=None):
     start = time.time()
 
     create_ml_vol()  # create the directory which imitates the bind mount on container
-    copy_example_files(dataset_name)  # copy the required files for model training 
-    if run_hpt: run_HPT(num_hpt_trials)               # run HPT and save tuned hyperparameters
+    copy_example_files(dataset_name)  # copy the required files for model training
     results, chart_data = train_and_predict()  # train and predict
 
     end = time.time()
@@ -272,8 +257,8 @@ def run_train_and_test(dataset_name, run_hpt=False, num_hpt_trials=None):
     results = {**results,
                "model": model_name,
                "dataset_name": dataset_name,
-               "run_hpt": run_hpt, 
-               "num_hpt_trials": num_hpt_trials if run_hpt else None, 
+               "run_hpt": False, 
+               "num_hpt_trials": None, 
                "elapsed_time_in_minutes": elapsed_time_in_minutes
                }
 
@@ -281,16 +266,24 @@ def run_train_and_test(dataset_name, run_hpt=False, num_hpt_trials=None):
 
 
 if __name__ == "__main__":
-
-    num_hpt_trials = 10
-    run_hpt_list = [False, True]
-    run_hpt_list = [True]
     
+    num_hpt_trials = None
+    run_hpt_list = [False]
 
-    datasets = "car concentric_circles four_worms iris penguins statlog steel_plate_fault unequal_variance_blobs wine".split()
-    datasets = ["four_worms"]
+    datasets = [
+        "concentric_circles",
+        "gesture_phase2",
+        "iris",
+        "landsat_satellite2",
+        "page_blocks2",
+        "penguins",
+        "spam2",
+        "steel_plate_fault2",
+        "unequal_variance_blobs",
+        "vehicle_silhouettes2",
+    ]
+    datasets = ["iris"]
 
-    
     for run_hpt in run_hpt_list:    
         all_results = []    
         for dataset_name in datasets:
