@@ -61,7 +61,7 @@ def get_hpt_specs():
     
 
 def save_json(file_path_and_name, data):
-    """Save json to a path (directory + filename)"""
+    """Save json to a path (directory + filename)"""    
     with open(file_path_and_name, 'w') as f:
         json.dump( data,  f, 
                   default=lambda o: o.__dict__,
